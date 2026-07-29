@@ -1,0 +1,29 @@
+.layout {
+	display: flex;
+	height: 100vh;
+
+	.title {
+		position: absolute;
+ 	 	left: 50%;
+  	transform: translateX(-50%);
+		color: #fff;
+		margin: 0;
+	}
+}
+
+.header {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+}
+
+.content {
+	background-color: var(--ant-color-primary-bg-hover);
+	flex: 1;
+}

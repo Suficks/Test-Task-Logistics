@@ -1,12 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 @import 'antd/dist/reset.css';
 @import 'antd/dist/antd.css';
 
 html {
-	scrollbar-gutter: stable;
 	overflow: auto;
-	/* overflow-y: scroll; */
 }
-
+`
 .center-wrapper {
 	height: 100vh;
 	display: flex;

@@ -9,86 +9,118 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './app/routes/__root'
-import { Route as IndexRouteImport } from './app/routes/index'
-import { Route as AuctionsIndexRouteImport } from './app/routes/auctions/index'
-import { Route as AuctionsAuctionIdRouteImport } from './app/routes/auctions/$auctionId'
+import { Route as LayoutRootRouteImport } from './app/routes/_layout/_root'
+import { Route as LayoutIndexRouteImport } from './app/routes/_layout/index'
+import { Route as LayoutAuctionsAuctionIdIndexRouteImport } from './app/routes/_layout/auctions/$auctionId/index'
+import { Route as LayoutAuctionsAuctionIdBetsRouteImport } from './app/routes/_layout/auctions/$auctionId/bets'
 
-const IndexRoute = IndexRouteImport.update({
+const LayoutRootRoute = LayoutRootRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => LayoutRootRoute,
 } as any)
-const AuctionsIndexRoute = AuctionsIndexRouteImport.update({
-  id: '/auctions/',
-  path: '/auctions/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuctionsAuctionIdRoute = AuctionsAuctionIdRouteImport.update({
-  id: '/auctions/$auctionId',
-  path: '/auctions/$auctionId',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const LayoutAuctionsAuctionIdIndexRoute =
+  LayoutAuctionsAuctionIdIndexRouteImport.update({
+    id: '/auctions/$auctionId/',
+    path: '/auctions/$auctionId/',
+    getParentRoute: () => LayoutRootRoute,
+  } as any)
+const LayoutAuctionsAuctionIdBetsRoute =
+  LayoutAuctionsAuctionIdBetsRouteImport.update({
+    id: '/auctions/$auctionId/bets',
+    path: '/auctions/$auctionId/bets',
+    getParentRoute: () => LayoutRootRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/auctions/$auctionId': typeof AuctionsAuctionIdRoute
-  '/auctions/': typeof AuctionsIndexRoute
+  '/': typeof LayoutIndexRoute
+  '/auctions/$auctionId/bets': typeof LayoutAuctionsAuctionIdBetsRoute
+  '/auctions/$auctionId/': typeof LayoutAuctionsAuctionIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/auctions/$auctionId': typeof AuctionsAuctionIdRoute
-  '/auctions': typeof AuctionsIndexRoute
+  '/': typeof LayoutIndexRoute
+  '/auctions/$auctionId/bets': typeof LayoutAuctionsAuctionIdBetsRoute
+  '/auctions/$auctionId': typeof LayoutAuctionsAuctionIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/auctions/$auctionId': typeof AuctionsAuctionIdRoute
-  '/auctions/': typeof AuctionsIndexRoute
+  '/_layout': typeof LayoutRootRouteWithChildren
+  '/_layout/': typeof LayoutIndexRoute
+  '/_layout/auctions/$auctionId/bets': typeof LayoutAuctionsAuctionIdBetsRoute
+  '/_layout/auctions/$auctionId/': typeof LayoutAuctionsAuctionIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auctions/$auctionId' | '/auctions/'
+  fullPaths: '/' | '/auctions/$auctionId/bets' | '/auctions/$auctionId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auctions/$auctionId' | '/auctions'
-  id: '__root__' | '/' | '/auctions/$auctionId' | '/auctions/'
+  to: '/' | '/auctions/$auctionId/bets' | '/auctions/$auctionId'
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/_layout/'
+    | '/_layout/auctions/$auctionId/bets'
+    | '/_layout/auctions/$auctionId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AuctionsAuctionIdRoute: typeof AuctionsAuctionIdRoute
-  AuctionsIndexRoute: typeof AuctionsIndexRoute
+  LayoutRootRoute: typeof LayoutRootRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof LayoutRootRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_layout/': {
+      id: '/_layout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof LayoutIndexRouteImport
+      parentRoute: typeof LayoutRootRoute
     }
-    '/auctions/': {
-      id: '/auctions/'
-      path: '/auctions'
-      fullPath: '/auctions/'
-      preLoaderRoute: typeof AuctionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auctions/$auctionId': {
-      id: '/auctions/$auctionId'
+    '/_layout/auctions/$auctionId/': {
+      id: '/_layout/auctions/$auctionId/'
       path: '/auctions/$auctionId'
-      fullPath: '/auctions/$auctionId'
-      preLoaderRoute: typeof AuctionsAuctionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/auctions/$auctionId/'
+      preLoaderRoute: typeof LayoutAuctionsAuctionIdIndexRouteImport
+      parentRoute: typeof LayoutRootRoute
+    }
+    '/_layout/auctions/$auctionId/bets': {
+      id: '/_layout/auctions/$auctionId/bets'
+      path: '/auctions/$auctionId/bets'
+      fullPath: '/auctions/$auctionId/bets'
+      preLoaderRoute: typeof LayoutAuctionsAuctionIdBetsRouteImport
+      parentRoute: typeof LayoutRootRoute
     }
   }
 }
 
+interface LayoutRootRouteChildren {
+  LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutAuctionsAuctionIdBetsRoute: typeof LayoutAuctionsAuctionIdBetsRoute
+  LayoutAuctionsAuctionIdIndexRoute: typeof LayoutAuctionsAuctionIdIndexRoute
+}
+
+const LayoutRootRouteChildren: LayoutRootRouteChildren = {
+  LayoutIndexRoute: LayoutIndexRoute,
+  LayoutAuctionsAuctionIdBetsRoute: LayoutAuctionsAuctionIdBetsRoute,
+  LayoutAuctionsAuctionIdIndexRoute: LayoutAuctionsAuctionIdIndexRoute,
+}
+
+const LayoutRootRouteWithChildren = LayoutRootRoute._addFileChildren(
+  LayoutRootRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuctionsAuctionIdRoute: AuctionsAuctionIdRoute,
-  AuctionsIndexRoute: AuctionsIndexRoute,
+  LayoutRootRoute: LayoutRootRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
