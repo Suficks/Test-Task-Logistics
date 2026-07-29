@@ -1,0 +1,55 @@
+@import 'antd/dist/reset.css';
+@import 'antd/dist/antd.css';
+
+html {
+	scrollbar-gutter: stable;
+	overflow: auto;
+	/* overflow-y: scroll; */
+}
+
+.center-wrapper {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0px 1000px var(--ant-color-bg-container) inset !important;
+	-webkit-text-fill-color: var(--ant-color-text) !important;
+	transition: background-color 5000s ease-in-out 0s !important;
+}
+
+.ant-input-affix-wrapper {
+	transition: none;
+}
+
+button {
+	cursor: pointer;
+}
+
+h1 {
+	font-size: var(--ant-font-size-heading-1);
+}
+
+h2 {
+	font-size: var(--ant-font-size-heading-2);
+}
+
+h3 {
+	font-size: var(--ant-font-size-heading-3);
+}
+
+h4 {
+	font-size: var(--ant-font-size-heading-4);
+}
+
+h5 {
+	font-size: var(--ant-font-size-heading-5);
+}
+
+h6 {
+	font-size: var(--ant-font-size-heading-6);
+}
