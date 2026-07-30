@@ -9,6 +9,10 @@ export type {
 } from './types';
 
 export {
+	auctionKeys,
+} from './api/auctionKeys';
+
+export {
 	getAuctionListItemDto,
 	type AuctionListItemDto,
 	type AuctionListItemMainDto,

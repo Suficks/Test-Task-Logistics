@@ -1,52 +1,110 @@
+import { API_BASE_URL } from '../client';
 import type {
 	AuctionListRequestDto,
 	AuctionListResponseDto,
 	AuctionShowResponseDto,
 } from '@/entities/auction';
 import type { BetListResponseDto, SetBetRequestDto } from '@/entities/bet';
-import {
-	getAuction,
-	getAuctionBets,
-	getAuctions,
-	setBet,
-} from '../mocks';
 
-const MOCK_DELAY_MS = 300;
+export class ApiRequestError extends Error {
+	constructor(
+		message: string,
+		public readonly status: number,
+		public readonly body?: unknown,
+	) {
+		super(message);
+		this.name = 'ApiRequestError';
+	}
+}
 
-function delay(ms = MOCK_DELAY_MS): Promise<void> {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+async function parseError(response: Response): Promise<never> {
+	let body: unknown;
+
+	try {
+		body = await response.json();
+	} catch {
+		body = undefined;
+	}
+
+	const message =
+		typeof body === 'object' &&
+		body !== null &&
+		'message' in body &&
+		typeof body.message === 'string'
+			? body.message
+			: response.statusText || 'Request failed';
+
+	throw new ApiRequestError(message, response.status, body);
 }
 
 export class AuctionsApi {
 	async listAuctions(
 		body: AuctionListRequestDto = {},
 	): Promise<AuctionListResponseDto> {
-		await delay();
-		return getAuctions(body);
+		const response = await fetch(`${API_BASE_URL}/auctions/list`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+		});
+
+		if (!response.ok) {
+			await parseError(response);
+		}
+
+		return response.json() as Promise<AuctionListResponseDto>;
 	}
 
 	async getAuction(body: {
 		auctionUuid: string;
 	}): Promise<AuctionShowResponseDto> {
-		await delay();
-		return getAuction(body);
+		const response = await fetch(
+			`${API_BASE_URL}/auctions/${body.auctionUuid}`,
+		);
+
+		if (!response.ok) {
+			await parseError(response);
+		}
+
+		return response.json() as Promise<AuctionShowResponseDto>;
 	}
 
 	async listBets(body: {
 		auctionUuid: string;
 		all?: boolean | null;
 	}): Promise<BetListResponseDto> {
-		await delay();
-		return getAuctionBets(body);
+		const url = new URL(
+			`${API_BASE_URL}/auctions/${body.auctionUuid}/bets`,
+			window.location.origin,
+		);
+
+		if (body.all != null) {
+			url.searchParams.set('all', String(body.all));
+		}
+
+		const response = await fetch(url.pathname + url.search);
+
+		if (!response.ok) {
+			await parseError(response);
+		}
+
+		return response.json() as Promise<BetListResponseDto>;
 	}
 
 	async setBet(body: {
 		auctionUuid: string;
 		setBetRequest: SetBetRequestDto;
 	}): Promise<void> {
-		await delay();
-		setBet(body);
+		const response = await fetch(
+			`${API_BASE_URL}/auctions/${body.auctionUuid}/bets`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body.setBetRequest),
+			},
+		);
+
+		if (!response.ok) {
+			await parseError(response);
+		}
 	}
 }
-
-export const auctionsApi = new AuctionsApi();

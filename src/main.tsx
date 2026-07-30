@@ -2,10 +2,10 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createRouter, ErrorComponent, RouterProvider } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider } from 'antd';
 
+import { AppProviders } from '@/app/providers';
+import { createQueryClient } from '@/shared/config/queryClient';
 import { routeTree } from './routeTree.gen.ts';
-import { createQueryClient } from './shared/config/queryClient.ts';
 
 import './index.css';
 
@@ -39,15 +39,9 @@ enableMocking().then(() => {
 	createRoot(document.getElementById('root')!).render(
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>
-				<ConfigProvider
-					theme={{
-						token: {
-							fontFamily: 'Tinos, sans-serif',
-						},
-					}}
-				>
+				<AppProviders>
 					<RouterProvider router={router} defaultPreload="viewport" />
-				</ConfigProvider>
+				</AppProviders>
 			</QueryClientProvider>
 		</StrictMode>,
 	);

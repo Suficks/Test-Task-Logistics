@@ -1,0 +1,38 @@
+.panel {
+	padding: 20px 20px 8px;
+	margin-bottom: 20px;
+	border-radius: var(--ant-border-radius-lg);
+	background: var(--ant-color-bg-container);
+	box-shadow: var(--ant-box-shadow-tertiary);
+}
+
+.fullWidth {
+	width: 100%;
+}
+
+.priceRow {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	padding-bottom: 12px;
+}
+
+@media (max-width: 640px) {
+	.panel {
+		padding: 16px 14px 4px;
+	}
+
+	.actions {
+		flex-direction: column-reverse;
+	}
+
+	.actions :global(.ant-btn) {
+		width: 100%;
+	}
+}
