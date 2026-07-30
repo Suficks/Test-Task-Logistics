@@ -327,7 +327,7 @@ export function getAuctionShowResponseDto({
 			id: 1236,
 			cargo_num: '00000001059',
 			cargo_date: '2026-05-04T14:49:09',
-			order_uid: '3a05d045-0e67-4f85-b20a-de81d18bba7a',
+			order_uid: 'a0',
 			auc_type: 'Down',
 			created_at: '2026-05-25T11:48:20',
 			...main,

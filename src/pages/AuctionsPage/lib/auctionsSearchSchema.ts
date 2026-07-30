@@ -92,9 +92,9 @@ export const auctionsSearchSchema = z.object({
 		return Number.isFinite(number) && number > 0 ? Math.floor(number) : 1;
 	}, z.number().int().positive()),
 	per_page: z.preprocess((value) => {
-		const number = Number(value ?? 10);
+		const number = Number(value ?? 5);
 		if (!Number.isFinite(number) || number <= 0) {
-			return 10;
+			return 5;
 		}
 		return Math.min(Math.floor(number), 100);
 	}, z.number().int().positive().max(100)),
@@ -116,7 +116,7 @@ export type AuctionsSearchParams = z.infer<typeof auctionsSearchSchema>;
 
 export const DEFAULT_AUCTIONS_SEARCH: AuctionsSearchParams = {
 	page: 1,
-	per_page: 10,
+	per_page: 5,
 };
 
 export function parseAuctionsSearch(search: unknown): AuctionsSearchParams {
