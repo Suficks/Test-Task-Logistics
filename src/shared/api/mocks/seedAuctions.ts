@@ -59,6 +59,9 @@ function createStoredAuction(params: {
 	distance: number;
 	yourBet?: number | null;
 	organizerName?: string;
+	coupling?: boolean | null;
+	lowLoader?: boolean | null;
+	additionalLoad?: boolean | null;
 	bets?: BetItemDto[];
 }): StoredAuction {
 	const pricePerKm =
@@ -102,6 +105,9 @@ function createStoredAuction(params: {
 			weight: params.weight,
 			volume: params.volume,
 			body_type: params.bodyType,
+			coupling: params.coupling ?? null,
+			low_loader: params.lowLoader ?? null,
+			additional_load: params.additionalLoad ?? null,
 		},
 		trading: {
 			status: params.status,
@@ -142,6 +148,9 @@ function createStoredAuction(params: {
 			distance: params.distance,
 			body_type: params.bodyType,
 			truck_count: 1,
+			coupling: params.coupling ?? null,
+			low_loader: params.lowLoader ?? null,
+			additional_load: params.additionalLoad ?? null,
 		},
 		trading: {
 			status: params.status,
@@ -266,6 +275,9 @@ export function generate(): StoredAuction[] {
 			min: 20000,
 			max: 50000,
 			distance: 1400,
+			coupling: true,
+			lowLoader: true,
+			additionalLoad: true,
 			bets: [
 				getBetItemDto({
 					id: 1,
@@ -305,6 +317,9 @@ export function generate(): StoredAuction[] {
 			min: 25000,
 			max: 80000,
 			distance: 350,
+			coupling: true,
+			lowLoader: false,
+			additionalLoad: false,
 			bets: [
 				getBetItemDto({
 					id: 2,
@@ -357,6 +372,9 @@ export function generate(): StoredAuction[] {
 			min: 20000,
 			max: 42000,
 			distance: 1600,
+			coupling: false,
+			lowLoader: true,
+			additionalLoad: true,
 			bets: [
 				getBetItemDto({
 					id: 4,
@@ -406,6 +424,9 @@ export function generate(): StoredAuction[] {
 			min: 28000,
 			max: 28000,
 			distance: 700,
+			coupling: false,
+			lowLoader: true,
+			additionalLoad: false,
 		}),
 		createStoredAuction({
 			id: 1005,

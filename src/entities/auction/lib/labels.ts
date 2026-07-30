@@ -2,6 +2,10 @@ import type {
 	AuctionListTradingStatusDto,
 	AuctionStatusDto,
 	AuctionTypeDto,
+	BidMeasurementTypeDto,
+	OperationTypeDto,
+	PaymentDelayTypeDto,
+	TradingStatusDto,
 } from '../types';
 
 export const AUCTION_TYPE_LABELS: Record<AuctionTypeDto, string> = {
@@ -24,12 +28,33 @@ export const AUCTION_STATUS_LABELS: Record<AuctionStatusDto, string> = {
 	Unknown: 'Неизвестно',
 };
 
-export const TRADING_STATUS_LABELS: Record<AuctionListTradingStatusDto, string> = {
+export const TRADING_STATUS_LABELS: Record<TradingStatusDto, string> = {
 	NotParticipating: 'Не участвую',
 	Leading: 'Лидирую',
 	Losing: 'Перебит',
-	Winner: 'Победитель',
+	OnPending: 'На рассмотрении',
 	Confirmed: 'Подтверждён',
+	ChoosingWinner: 'Выбор победителя',
+	Winner: 'Победитель',
+	Accepted: 'Принято',
+	Unknown: 'Неизвестно',
+};
+
+export const BID_MEASUREMENT_LABELS: Record<BidMeasurementTypeDto, string> = {
+	PerRoute: 'За рейс',
+	PerKm: 'За км',
+	Unknown: 'Неизвестно',
+};
+
+export const OPERATION_TYPE_LABELS: Record<OperationTypeDto, string> = {
+	Loading: 'Погрузка',
+	Unloading: 'Выгрузка',
+	Unknown: 'Неизвестно',
+};
+
+export const PAYMENT_DELAY_LABELS: Record<PaymentDelayTypeDto, string> = {
+	CalendarDays: 'Календарные дни',
+	WorkDays: 'Рабочие дни',
 	Unknown: 'Неизвестно',
 };
 
@@ -48,7 +73,14 @@ export const AUCTION_STATUS_CODE_OPTIONS: Array<{
 ];
 
 export const TRADING_STATUS_OPTIONS = (
-	Object.keys(TRADING_STATUS_LABELS) as AuctionListTradingStatusDto[]
+	[
+		'NotParticipating',
+		'Leading',
+		'Losing',
+		'Winner',
+		'Confirmed',
+		'Unknown',
+	] as AuctionListTradingStatusDto[]
 ).map((value) => ({
 	value,
 	label: TRADING_STATUS_LABELS[value],

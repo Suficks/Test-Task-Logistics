@@ -1,0 +1,1 @@
+export { AuctionRoutes } from './AuctionRoutes';

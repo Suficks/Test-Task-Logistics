@@ -42,3 +42,46 @@ export function formatVolume(value?: number | null): string {
 	}
 	return `${value} м³`;
 }
+
+export function formatFlag(value?: boolean | null): string {
+	if (value == null) {
+		return '—';
+	}
+	return value ? 'Да' : 'Нет';
+}
+
+type LoadingTypesFlags = {
+	side?: boolean | null;
+	top?: boolean | null;
+	rear?: boolean | null;
+	full?: boolean | null;
+};
+
+export function formatLoadingTypes(loadingTypes: LoadingTypesFlags): string {
+	const items = [
+		loadingTypes.side && 'Боковая',
+		loadingTypes.top && 'Верхняя',
+		loadingTypes.rear && 'Задняя',
+		loadingTypes.full && 'Полная',
+	].filter(Boolean);
+
+	return items.length > 0 ? items.join(', ') : '—';
+}
+
+type DocsFlags = {
+	tir?: boolean | null;
+	cmr?: boolean | null;
+	t1?: boolean | null;
+	med?: boolean | null;
+};
+
+export function formatDocs(docs: DocsFlags): string {
+	const items = [
+		docs.tir && 'TIR',
+		docs.cmr && 'CMR',
+		docs.t1 && 'T1',
+		docs.med && 'Мед.',
+	].filter(Boolean);
+
+	return items.length > 0 ? items.join(', ') : 'Не требуются';
+}

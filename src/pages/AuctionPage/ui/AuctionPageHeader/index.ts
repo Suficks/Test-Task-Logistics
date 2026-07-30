@@ -1,0 +1,1 @@
+export { AuctionPageHeader } from './AuctionPageHeader';

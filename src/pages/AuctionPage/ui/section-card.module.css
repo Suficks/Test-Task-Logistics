@@ -1,0 +1,17 @@
+.fullWidth {
+	grid-column: 1 / -1;
+}
+
+.muted {
+	color: var(--ant-color-text-secondary);
+}
+
+.descriptions :global(.ant-descriptions-item-container) {
+	align-items: center;
+}
+
+.priceHighlight {
+	font-size: var(--ant-font-size-xl);
+	font-weight: 700;
+	color: var(--ant-color-primary);
+}

@@ -1,0 +1,1 @@
+export { AuctionMainCard } from './AuctionMainCard';
