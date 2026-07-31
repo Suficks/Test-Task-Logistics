@@ -11,6 +11,7 @@ import {
 } from '@/entities/auction/lib/labels';
 import { SetBetForm } from '@/features/set-bet';
 import { ApiRequestError } from '@/shared/api/services';
+import { Panel } from '@/shared/ui/Panel';
 import { AuctionBetsPageModel } from '../model/AuctionBetsPageModel';
 import { BetsList } from './BetsList';
 
@@ -132,9 +133,9 @@ export const AuctionBetsPage = observer(function AuctionBetsPage() {
 			)}
 
 			{isLoading && !auction && (
-				<div className={styles.skeletonCard}>
+				<Panel className={styles.skeletonCard}>
 					<Skeleton active paragraph={{ rows: 8 }} />
-				</div>
+				</Panel>
 			)}
 
 			{auction && (

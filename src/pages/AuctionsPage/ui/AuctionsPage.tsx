@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useQueryClient } from '@tanstack/react-query';
-import { Alert, Button, Empty, Pagination, Skeleton, Typography } from 'antd';
+import { Typography } from 'antd';
 import { getRouteApi } from '@tanstack/react-router';
 
+import { AuctionsList } from '@/widgets/auctions-list';
 import {
 	cleanAuctionsSearch,
 	toAuctionListRequest,
 	type AuctionsSearchParams,
 } from '../lib/auctionsSearchSchema';
 import { AuctionsPageModel } from '../model/AuctionsPageModel';
-import { AuctionCard } from './AuctionCard';
 import { AuctionsFilters } from './AuctionsFilters';
 
 import styles from './auctions-page.module.css';
@@ -74,69 +74,23 @@ export const AuctionsPage = observer(function AuctionsPage() {
 				}
 			/>
 
-			{model.listQuery.isError && (
-				<Alert
-					className={styles.state}
-					type="error"
-					showIcon
-					message="Не удалось загрузить аукционы"
-					description={
-						model.listQuery.error instanceof Error
-							? model.listQuery.error.message
-							: 'Попробуйте ещё раз'
-					}
-					action={
-						<Button size="small" onClick={() => model.refetch()}>
-							Повторить
-						</Button>
-					}
-				/>
-			)}
-
-			{model.listQuery.isPending && (
-				<div className={styles.list}>
-					{Array.from({ length: 3 }).map((_, index) => (
-						<div key={index} className={styles.skeletonCard}>
-							<Skeleton active paragraph={{ rows: 5 }} />
-						</div>
-					))}
-				</div>
-			)}
-
-			{model.isEmpty && (
-				<div className={styles.state}>
-					<Empty description="По заданным фильтрам аукционов нет" />
-				</div>
-			)}
-
-			{!model.listQuery.isPending && !model.listQuery.isError && (
-				<>
-					<div className={styles.list}>
-						{model.auctions.map((auction) => (
-							<AuctionCard
-								key={auction.main.order_uid}
-								auction={auction}
-								onPrefetch={model.prefetchDetail}
-							/>
-						))}
-					</div>
-
-					{model.meta && model.meta.total > 0 && (
-						<div className={styles.pagination}>
-							<Pagination
-								current={model.meta.current_page}
-								pageSize={model.meta.per_page}
-								total={model.meta.total}
-								showSizeChanger
-								pageSizeOptions={[5, 10, 20]}
-								onChange={(page, perPage) =>
-									updateSearch({ page, per_page: perPage })
-								}
-							/>
-						</div>
-					)}
-				</>
-			)}
+			<AuctionsList
+				auctions={model.auctions}
+				meta={model.meta}
+				isPending={model.listQuery.isPending}
+				isError={model.listQuery.isError}
+				isEmpty={model.isEmpty}
+				errorMessage={
+					model.listQuery.error instanceof Error
+						? model.listQuery.error.message
+						: undefined
+				}
+				onRetry={() => model.refetch()}
+				onPrefetch={model.prefetchDetail}
+				onPageChange={(page, perPage) =>
+					updateSearch({ page, per_page: perPage })
+				}
+			/>
 		</div>
 	);
 });

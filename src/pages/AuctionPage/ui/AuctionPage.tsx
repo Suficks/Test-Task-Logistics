@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Skeleton } from 'antd';
 import { getRouteApi } from '@tanstack/react-router';
 
+import { Panel } from '@/shared/ui/Panel';
 import { AuctionPageModel } from '../model/AuctionPageModel';
 import { AuctionCargoCard } from './AuctionCargoCard';
 import { AuctionContactsCard } from './AuctionContactsCard';
@@ -72,9 +73,9 @@ export const AuctionPage = observer(function AuctionPage() {
 			)}
 
 			{model.detailQuery.isPending && (
-				<div className={styles.skeletonCard}>
+				<Panel className={styles.skeletonCard}>
 					<Skeleton active paragraph={{ rows: 10 }} />
-				</div>
+				</Panel>
 			)}
 
 			{auction && trading && (

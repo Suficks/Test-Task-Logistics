@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 import { z } from 'zod';
 
 import { getCities } from '@/shared/api/mocks/cities';
+import { Panel } from '@/shared/ui/Panel';
 import {
 	AUCTION_STATUS_CODE_OPTIONS,
 	AUCTION_TYPE_OPTIONS,
@@ -113,7 +114,7 @@ export function AuctionsFilters({
 	});
 
 	return (
-		<div className={styles.panel}>
+		<Panel className={styles.filters}>
 			<Form layout="vertical" onFinish={() => void submit()}>
 				<Row gutter={[16, 0]}>
 					<Col xs={24} md={12} lg={8} xl={6}>
@@ -347,6 +348,6 @@ export function AuctionsFilters({
 					</Button>
 				</div>
 			</Form>
-		</div>
+		</Panel>
 	);
 }

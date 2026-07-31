@@ -1,9 +1,6 @@
-.panel {
+.filters {
 	padding: 20px 20px 8px;
 	margin-bottom: 20px;
-	border-radius: var(--ant-border-radius-lg);
-	background: var(--ant-color-bg-container);
-	box-shadow: var(--ant-box-shadow-tertiary);
 }
 
 .fullWidth {
@@ -24,7 +21,7 @@
 }
 
 @media (max-width: 640px) {
-	.panel {
+	.filters {
 		padding: 16px 14px 4px;
 	}
 

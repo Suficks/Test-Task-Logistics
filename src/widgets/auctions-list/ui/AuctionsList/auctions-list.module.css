@@ -1,0 +1,21 @@
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.skeletonCard {
+	padding: 20px;
+}
+
+.state {
+	margin-top: 8px;
+	padding: 24px;
+}
+
+.pagination {
+	display: flex;
+	justify-content: center;
+	margin-top: 24px;
+	padding: 16px;
+}
