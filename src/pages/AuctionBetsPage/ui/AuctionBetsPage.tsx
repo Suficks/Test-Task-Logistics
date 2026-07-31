@@ -9,10 +9,10 @@ import {
 	AUCTION_TYPE_LABELS,
 	TRADING_STATUS_LABELS,
 } from '@/entities/auction/lib/labels';
+import { SetBetForm } from '@/features/set-bet';
 import { ApiRequestError } from '@/shared/api/services';
 import { AuctionBetsPageModel } from '../model/AuctionBetsPageModel';
 import { BetsList } from './BetsList';
-import { SetBetForm } from './SetBetForm';
 
 import styles from './auction-bets-page.module.css';
 
