@@ -13,6 +13,7 @@ import {
 	formatVolume,
 	formatWeight,
 } from '@/shared/lib/format';
+import { getAuctionPrimaryAction } from '../../lib/getAuctionPrimaryAction';
 
 import styles from './auction-card.module.css';
 
@@ -23,41 +24,10 @@ type AuctionCardProps = {
 	onPrefetch: (auctionUuid: string) => void;
 };
 
-function getPrimaryAction(auction: AuctionListItemDto) {
-	const canSetBet = Boolean(auction.trading.can_set_bet);
-	const hasBet = Boolean(auction.trading.your?.bet);
-	const orderUid = auction.main.order_uid;
-
-	if (canSetBet && hasBet) {
-		return {
-			label: 'Изменить ставку',
-			disabled: false,
-			to: '/auctions/$auctionId/bets' as const,
-			params: { auctionId: orderUid },
-		};
-	}
-
-	if (canSetBet) {
-		return {
-			label: 'Сделать ставку',
-			disabled: false,
-			to: '/auctions/$auctionId/bets' as const,
-			params: { auctionId: orderUid },
-		};
-	}
-
-	return {
-		label: 'Смотреть ставки',
-		disabled: false,
-		to: '/auctions/$auctionId/bets' as const,
-		params: { auctionId: orderUid },
-	};
-}
-
 export function AuctionCard({ auction, onPrefetch }: AuctionCardProps) {
 	const { main, route, cargo, trading } = auction;
 	const orderUid = main.order_uid;
-	const action = getPrimaryAction(auction);
+	const action = getAuctionPrimaryAction(auction);
 
 	return (
 		<Card
