@@ -150,7 +150,7 @@ src/
   app/          # роутинг, провайдеры, тема
   pages/        # страницы + page models
   widgets/      # auctions-list
-  features/     # set-bet
+  features/     # set-bet, filter-auctions
   entities/     # auction, bet
   shared/       # api, ui, lib, transports
   msw/          # handlers + worker

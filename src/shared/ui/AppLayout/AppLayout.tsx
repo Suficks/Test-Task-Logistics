@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Layout, Typography } from 'antd';
 import { Link } from '@tanstack/react-router';
 
-import { DEFAULT_AUCTIONS_SEARCH } from '@/pages/AuctionsPage';
+import { DEFAULT_AUCTIONS_SEARCH } from '@/features/filter-auctions';
 
 import styles from './app-layout.module.css';
 

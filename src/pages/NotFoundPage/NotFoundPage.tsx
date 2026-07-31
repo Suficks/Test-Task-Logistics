@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { Button, Flex, Result } from 'antd';
 import { useNavigate } from '@tanstack/react-router';
 
-import { DEFAULT_AUCTIONS_SEARCH } from '@/pages/AuctionsPage';
+import { DEFAULT_AUCTIONS_SEARCH } from '@/features/filter-auctions';
 
 export const NotFoundPage = observer(function NotFoundPage() {
 	const navigate = useNavigate();

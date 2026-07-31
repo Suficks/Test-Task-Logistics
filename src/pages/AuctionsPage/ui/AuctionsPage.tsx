@@ -4,14 +4,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Typography } from 'antd';
 import { getRouteApi } from '@tanstack/react-router';
 
-import { AuctionsList } from '@/widgets/auctions-list';
 import {
+	AuctionsFilters,
 	cleanAuctionsSearch,
 	toAuctionListRequest,
 	type AuctionsSearchParams,
-} from '../lib/auctionsSearchSchema';
+} from '@/features/filter-auctions';
+import { AuctionsList } from '@/widgets/auctions-list';
 import { AuctionsPageModel } from '../model/AuctionsPageModel';
-import { AuctionsFilters } from './AuctionsFilters';
 
 import styles from './auctions-page.module.css';
 

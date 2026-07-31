@@ -7,7 +7,7 @@ import {
 	TRADING_STATUS_LABELS,
 } from '@/entities/auction/lib/labels';
 import type { AuctionShowResponseDto } from '@/entities/auction';
-import { DEFAULT_AUCTIONS_SEARCH } from '@/pages/AuctionsPage';
+import { DEFAULT_AUCTIONS_SEARCH } from '@/features/filter-auctions';
 
 import styles from './auction-page-header.module.css';
 
