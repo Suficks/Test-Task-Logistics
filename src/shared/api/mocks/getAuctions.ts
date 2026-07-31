@@ -7,7 +7,11 @@ import type {
 	AuctionStatusDto,
 	TradingStatusDto,
 } from '@/entities/auction';
-import type { BetListResponseDto, SetBetRequestDto } from '@/entities/bet';
+import type {
+	BetItemDto,
+	BetListResponseDto,
+	SetBetRequestDto,
+} from '@/entities/bet';
 import { getBetItemDto } from '@/entities/bet';
 import type { ValidationProblemDto } from '../types';
 import { MockError } from './MockError';
@@ -207,6 +211,63 @@ export function getAuction({
 	return findAuction(auctionUuid).detail;
 }
 
+function isActiveBet(bet: BetItemDto): boolean {
+	return !bet.is_rejected && !bet.cancel_reason;
+}
+
+function compareBetsByRank(
+	a: BetItemDto,
+	b: BetItemDto,
+	direction: 'asc' | 'desc',
+): number {
+	const priceDiff =
+		direction === 'asc'
+			? a.price_with_vat - b.price_with_vat
+			: b.price_with_vat - a.price_with_vat;
+
+	if (priceDiff !== 0) {
+		return priceDiff;
+	}
+
+	return a.created_at.localeCompare(b.created_at);
+}
+
+/** Пересчитывает места: Down/остальные — дешевле выше, Up — дороже выше. */
+function rankAuctionBets(
+	bets: BetItemDto[],
+	aucType: string | null | undefined,
+): BetItemDto[] {
+	const direction = aucType === 'Up' ? 'desc' : 'asc';
+	const active = bets
+		.filter(isActiveBet)
+		.sort((a, b) => compareBetsByRank(a, b, direction));
+	const inactive = bets.filter((bet) => !isActiveBet(bet));
+
+	active.forEach((bet, index) => {
+		Object.assign(bet, { place: index + 1, is_win: false });
+	});
+	inactive.forEach((bet) => {
+		Object.assign(bet, { place: null, is_win: false });
+	});
+
+	return [...active, ...inactive];
+}
+
+function sortBetsForResponse(bets: BetItemDto[]): BetItemDto[] {
+	return [...bets].sort((a, b) => {
+		if (a.place == null && b.place == null) {
+			return b.created_at.localeCompare(a.created_at);
+		}
+		if (a.place == null) {
+			return 1;
+		}
+		if (b.place == null) {
+			return -1;
+		}
+		return a.place - b.place;
+	});
+}
+
 export function getAuctionBets({
 	auctionUuid,
 	all,
@@ -222,9 +283,9 @@ export function getAuctionBets({
 
 	const bets = all
 		? auction.bets
-		: auction.bets.filter((bet) => !bet.is_rejected && !bet.cancel_reason);
+		: auction.bets.filter(isActiveBet);
 
-	return { bets };
+	return { bets: sortBetsForResponse(bets) };
 }
 
 export function setBet({
@@ -311,13 +372,10 @@ export function setBet({
 	const noVat = priceNoVat(safePrice);
 	const auctionId = auction.detail.main.id;
 	const createdAt = new Date().toISOString().slice(0, 19);
-	const distance = auction.detail.cargo.distance ?? 0;
-	const pricePerKm =
-		distance > 0 ? Math.round((noVat / distance) * 100) / 100 : 0;
-	const available = Math.max(
-		tradingPrice.min ?? 0,
-		safePrice - (tradingPrice.step ?? 0),
-	);
+	const aucType = auction.detail.main.auc_type;
+	const step = tradingPrice.step ?? 0;
+	const min = tradingPrice.min ?? 0;
+	const max = tradingPrice.max ?? Number.POSITIVE_INFINITY;
 
 	const newBet = getBetItemDto({
 		id: nextBetId++,
@@ -328,31 +386,40 @@ export function setBet({
 		organization_name: 'ООО Перевозчик',
 		price_with_vat: safePrice,
 		price_no_vat: noVat,
-		place: 1,
+		place: null,
 		is_win: false,
 		is_rejected: false,
 		cancel_reason: '',
 	});
 
-	auction.bets
-		.filter((bet) => bet.subscriber_id !== CURRENT_USER_SUBSCRIBER_ID)
-		.forEach((bet, index) => {
-			Object.assign(bet, { place: index + 2, is_win: false });
-		});
+	const otherBets = auction.bets.filter(
+		(bet) => bet.subscriber_id !== CURRENT_USER_SUBSCRIBER_ID,
+	);
+	auction.bets = rankAuctionBets([newBet, ...otherBets], aucType);
 
-	auction.bets = [
-		newBet,
-		...auction.bets.filter((bet) => bet.subscriber_id !== CURRENT_USER_SUBSCRIBER_ID),
-	];
+	const leadingBet = auction.bets.find(isActiveBet) ?? newBet;
+	const leadingPrice = leadingBet.price_with_vat;
+	const leadingNoVat = leadingBet.price_no_vat;
+	const distance = auction.detail.cargo.distance ?? 0;
+	const pricePerKm =
+		distance > 0
+			? Math.round((leadingNoVat / distance) * 100) / 100
+			: 0;
+	const available =
+		aucType === 'Up'
+			? Math.min(max, leadingPrice + step)
+			: Math.max(min, leadingPrice - step);
+	const isLeading = newBet.place === 1;
+	const statusMobile: TradingStatusDto = isLeading ? 'Leading' : 'Losing';
 
 	Object.assign(auction.detail.trading, {
-		status_mobile: 'Leading',
+		status_mobile: statusMobile,
 		is_bidder: true,
 		can_set_bet: true,
 		price: {
 			...tradingPrice,
-			current: safePrice,
-			current_no_vat: noVat,
+			current: leadingPrice,
+			current_no_vat: leadingNoVat,
 			available,
 			available_no_vat: priceNoVat(available),
 			price_per_km: pricePerKm,
@@ -368,7 +435,7 @@ export function setBet({
 
 	Object.assign(auction.listItem.main ?? {}, { price_per_km: pricePerKm });
 	Object.assign(auction.listItem.trading ?? {}, {
-		status_mobile: 'Leading',
+		status_mobile: statusMobile,
 		is_bidder: true,
 		can_set_bet: true,
 		is_available: true,
@@ -382,14 +449,14 @@ export function setBet({
 
 	if (listPrice) {
 		Object.assign(listPrice, {
-			current: safePrice,
-			current_no_vat: noVat,
+			current: leadingPrice,
+			current_no_vat: leadingNoVat,
 		});
 	} else if (auction.listItem.trading) {
 		auction.listItem.trading.price = {
-			start: tradingPrice.start ?? safePrice,
-			current: safePrice,
-			current_no_vat: noVat,
+			start: tradingPrice.start ?? leadingPrice,
+			current: leadingPrice,
+			current_no_vat: leadingNoVat,
 		};
 	}
 
