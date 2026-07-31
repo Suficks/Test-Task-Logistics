@@ -43,7 +43,7 @@ export const AuctionPage = observer(function AuctionPage() {
 	const trading = auction?.trading;
 
 	return (
-		<div className={styles.page}>
+		<div>
 			<AuctionPageHeader
 				auctionId={auctionId}
 				auction={auction}

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ConfigProvider } from 'antd';
+import { App, ConfigProvider } from 'antd';
 import ruRU from 'antd/locale/ru_RU';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -15,7 +15,7 @@ type AppProvidersProps = {
 export function AppProviders({ children }: AppProvidersProps) {
 	return (
 		<ConfigProvider locale={ruRU} theme={antdTheme}>
-			{children}
+			<App>{children}</App>
 		</ConfigProvider>
 	);
 }

@@ -24,8 +24,107 @@ const CURRENT_USER_SUBSCRIBER_ID = 13;
 const CURRENT_USER_ORG_ID = 14;
 const VAT_RATE = 0.2;
 
+const CARRIERS = [
+	{
+		subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
+		organization_id: CURRENT_USER_ORG_ID,
+		organization_name: 'ООО Перевозчик',
+		organization_inn: '9616244307',
+	},
+	{
+		subscriber_id: 99,
+		organization_id: 99,
+		organization_name: 'АО Логистик',
+		organization_inn: '7709988776',
+	},
+	{
+		subscriber_id: 50,
+		organization_id: 50,
+		organization_name: 'ООО УралКарго',
+		organization_inn: '6671234567',
+	},
+	{
+		subscriber_id: 77,
+		organization_id: 77,
+		organization_name: 'ООО СеверТранс',
+		organization_inn: '5901122334',
+	},
+	{
+		subscriber_id: 88,
+		organization_id: 88,
+		organization_name: 'ООО СтарыйПуть',
+		organization_inn: '7701234567',
+	},
+	{
+		subscriber_id: 61,
+		organization_id: 61,
+		organization_name: 'ООО ЮгЛогистик',
+		organization_inn: '2311456789',
+	},
+	{
+		subscriber_id: 42,
+		organization_id: 42,
+		organization_name: 'ИП Волков',
+		organization_inn: '5904987654',
+	},
+	{
+		subscriber_id: 33,
+		organization_id: 33,
+		organization_name: 'ООО ТрансСибирь',
+		organization_inn: '5403112233',
+	},
+	{
+		subscriber_id: 25,
+		organization_id: 25,
+		organization_name: 'ООО Магистраль',
+		organization_inn: '7801556677',
+	},
+	{
+		subscriber_id: 18,
+		organization_id: 18,
+		organization_name: 'ООО БыстрыйГруз',
+		organization_inn: '1601987654',
+	},
+] as const;
+
 function priceNoVat(priceWithVat: number): number {
 	return Math.round((priceWithVat / (1 + VAT_RATE)) * 100) / 100;
+}
+
+function makeBets(
+	auctionId: number,
+	items: Array<{
+		id: number;
+		carrierIndex: number;
+		price: number;
+		place: number | null;
+		created_at: string;
+		is_win?: boolean;
+		is_rejected?: boolean;
+		is_counter?: boolean;
+		cancel_reason?: string;
+	}>,
+): BetItemDto[] {
+	return items.map((item) => {
+		const carrier = CARRIERS[item.carrierIndex] ?? CARRIERS[0];
+
+		return getBetItemDto({
+			id: item.id,
+			auction_id: auctionId,
+			subscriber_id: carrier.subscriber_id,
+			organization_id: carrier.organization_id,
+			organization_name: carrier.organization_name,
+			organization_inn: carrier.organization_inn,
+			price_with_vat: item.price,
+			price_no_vat: priceNoVat(item.price),
+			place: item.place,
+			created_at: item.created_at,
+			is_win: item.is_win ?? false,
+			is_rejected: item.is_rejected ?? false,
+			is_counter: item.is_counter ?? false,
+			cancel_reason: item.cancel_reason ?? '',
+		});
+	});
 }
 
 function createStoredAuction(params: {
@@ -278,17 +377,82 @@ export function generate(): StoredAuction[] {
 			coupling: true,
 			lowLoader: true,
 			additionalLoad: true,
-			bets: [
-				getBetItemDto({
-					id: 1,
-					auction_id: 1001,
-					price_with_vat: 45000,
-					price_no_vat: priceNoVat(45000),
-					organization_name: 'ООО СеверТранс',
+			bets: makeBets(1001, [
+				{
+					id: 101,
+					carrierIndex: 3,
+					price: 45000,
 					place: 1,
 					created_at: '2026-07-29T10:00:00',
-				}),
-			],
+				},
+				{
+					id: 102,
+					carrierIndex: 1,
+					price: 45500,
+					place: 2,
+					created_at: '2026-07-29T09:40:00',
+				},
+				{
+					id: 103,
+					carrierIndex: 5,
+					price: 46000,
+					place: 3,
+					created_at: '2026-07-29T09:10:00',
+				},
+				{
+					id: 104,
+					carrierIndex: 2,
+					price: 46500,
+					place: 4,
+					created_at: '2026-07-29T08:50:00',
+				},
+				{
+					id: 105,
+					carrierIndex: 6,
+					price: 47000,
+					place: 5,
+					created_at: '2026-07-29T08:20:00',
+				},
+				{
+					id: 106,
+					carrierIndex: 7,
+					price: 47500,
+					place: 6,
+					created_at: '2026-07-28T21:00:00',
+				},
+				{
+					id: 107,
+					carrierIndex: 8,
+					price: 48000,
+					place: 7,
+					created_at: '2026-07-28T19:30:00',
+				},
+				{
+					id: 108,
+					carrierIndex: 9,
+					price: 48500,
+					place: 8,
+					created_at: '2026-07-28T18:45:00',
+				},
+				{
+					id: 109,
+					carrierIndex: 4,
+					price: 49000,
+					place: null,
+					is_rejected: true,
+					cancel_reason: 'Ставка перебита новым предложением',
+					created_at: '2026-07-28T18:00:00',
+				},
+				{
+					id: 110,
+					carrierIndex: 1,
+					price: 49500,
+					place: null,
+					is_rejected: true,
+					cancel_reason: 'Отозвана участником',
+					created_at: '2026-07-28T16:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1002,
@@ -320,30 +484,73 @@ export function generate(): StoredAuction[] {
 			coupling: true,
 			lowLoader: false,
 			additionalLoad: false,
-			bets: [
-				getBetItemDto({
-					id: 2,
-					auction_id: 1002,
-					subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
-					organization_id: CURRENT_USER_ORG_ID,
-					organization_name: 'ООО Перевозчик',
-					price_with_vat: 32000,
-					price_no_vat: priceNoVat(32000),
+			bets: makeBets(1002, [
+				{
+					id: 201,
+					carrierIndex: 0,
+					price: 32000,
 					place: 1,
 					created_at: '2026-07-29T12:00:00',
-				}),
-				getBetItemDto({
-					id: 3,
-					auction_id: 1002,
-					subscriber_id: 99,
-					organization_id: 99,
-					organization_name: 'АО Логистик',
-					price_with_vat: 30000,
-					price_no_vat: priceNoVat(30000),
+				},
+				{
+					id: 202,
+					carrierIndex: 1,
+					price: 30000,
 					place: 2,
 					created_at: '2026-07-29T11:00:00',
-				}),
-			],
+				},
+				{
+					id: 203,
+					carrierIndex: 2,
+					price: 29000,
+					place: 3,
+					created_at: '2026-07-29T10:30:00',
+				},
+				{
+					id: 204,
+					carrierIndex: 3,
+					price: 28000,
+					place: 4,
+					created_at: '2026-07-29T10:00:00',
+				},
+				{
+					id: 205,
+					carrierIndex: 5,
+					price: 27500,
+					place: 5,
+					created_at: '2026-07-29T09:20:00',
+				},
+				{
+					id: 206,
+					carrierIndex: 6,
+					price: 27000,
+					place: 6,
+					created_at: '2026-07-29T08:40:00',
+				},
+				{
+					id: 207,
+					carrierIndex: 7,
+					price: 26500,
+					place: 7,
+					created_at: '2026-07-28T22:00:00',
+				},
+				{
+					id: 208,
+					carrierIndex: 8,
+					price: 26000,
+					place: 8,
+					created_at: '2026-07-28T20:15:00',
+				},
+				{
+					id: 209,
+					carrierIndex: 4,
+					price: 25500,
+					place: null,
+					is_rejected: true,
+					cancel_reason: 'Не соответствует шагу ставки',
+					created_at: '2026-07-28T19:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1003,
@@ -375,28 +582,73 @@ export function generate(): StoredAuction[] {
 			coupling: false,
 			lowLoader: true,
 			additionalLoad: true,
-			bets: [
-				getBetItemDto({
-					id: 4,
-					auction_id: 1003,
-					subscriber_id: 50,
-					organization_id: 50,
-					organization_name: 'ООО УралКарго',
-					price_with_vat: 35000,
-					price_no_vat: priceNoVat(35000),
+			bets: makeBets(1003, [
+				{
+					id: 301,
+					carrierIndex: 2,
+					price: 35000,
 					place: 1,
-				}),
-				getBetItemDto({
-					id: 5,
-					auction_id: 1003,
-					subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
-					organization_id: CURRENT_USER_ORG_ID,
-					organization_name: 'ООО Перевозчик',
-					price_with_vat: 38000,
-					price_no_vat: priceNoVat(38000),
+					created_at: '2026-07-29T14:00:00',
+				},
+				{
+					id: 302,
+					carrierIndex: 0,
+					price: 38000,
 					place: 2,
-				}),
-			],
+					created_at: '2026-07-29T13:20:00',
+				},
+				{
+					id: 303,
+					carrierIndex: 1,
+					price: 38500,
+					place: 3,
+					created_at: '2026-07-29T12:50:00',
+				},
+				{
+					id: 304,
+					carrierIndex: 3,
+					price: 39000,
+					place: 4,
+					created_at: '2026-07-29T12:10:00',
+				},
+				{
+					id: 305,
+					carrierIndex: 5,
+					price: 39500,
+					place: 5,
+					created_at: '2026-07-29T11:40:00',
+				},
+				{
+					id: 306,
+					carrierIndex: 6,
+					price: 40000,
+					place: 6,
+					created_at: '2026-07-29T11:00:00',
+				},
+				{
+					id: 307,
+					carrierIndex: 7,
+					price: 40500,
+					place: 7,
+					created_at: '2026-07-29T10:20:00',
+				},
+				{
+					id: 308,
+					carrierIndex: 8,
+					price: 41000,
+					place: 8,
+					created_at: '2026-07-29T09:30:00',
+				},
+				{
+					id: 309,
+					carrierIndex: 4,
+					price: 41500,
+					place: null,
+					is_rejected: true,
+					cancel_reason: 'Ставка отозвана',
+					created_at: '2026-07-28T17:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1004,
@@ -482,19 +734,51 @@ export function generate(): StoredAuction[] {
 			min: 15000,
 			max: 30000,
 			distance: 400,
-			bets: [
-				getBetItemDto({
-					id: 6,
-					auction_id: 1006,
-					subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
-					organization_id: CURRENT_USER_ORG_ID,
-					organization_name: 'ООО Перевозчик',
-					price_with_vat: 22000,
-					price_no_vat: priceNoVat(22000),
+			bets: makeBets(1006, [
+				{
+					id: 601,
+					carrierIndex: 0,
+					price: 22000,
 					place: 1,
 					is_win: true,
-				}),
-			],
+					created_at: '2026-07-20T16:00:00',
+				},
+				{
+					id: 602,
+					carrierIndex: 1,
+					price: 23000,
+					place: 2,
+					created_at: '2026-07-20T15:30:00',
+				},
+				{
+					id: 603,
+					carrierIndex: 2,
+					price: 23500,
+					place: 3,
+					created_at: '2026-07-20T15:00:00',
+				},
+				{
+					id: 604,
+					carrierIndex: 3,
+					price: 24000,
+					place: 4,
+					created_at: '2026-07-20T14:20:00',
+				},
+				{
+					id: 605,
+					carrierIndex: 5,
+					price: 24500,
+					place: 5,
+					created_at: '2026-07-20T13:40:00',
+				},
+				{
+					id: 606,
+					carrierIndex: 6,
+					price: 25000,
+					place: 6,
+					created_at: '2026-07-20T12:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1007,
@@ -526,15 +810,43 @@ export function generate(): StoredAuction[] {
 			max: 60000,
 			distance: 700,
 			organizerName: 'ХимЛогистика',
-			bets: [
-				getBetItemDto({
-					id: 7,
-					auction_id: 1007,
-					price_with_vat: 55000,
-					price_no_vat: priceNoVat(55000),
+			bets: makeBets(1007, [
+				{
+					id: 701,
+					carrierIndex: 3,
+					price: 55000,
 					place: 1,
-				}),
-			],
+					created_at: '2026-07-29T11:00:00',
+				},
+				{
+					id: 702,
+					carrierIndex: 1,
+					price: 56000,
+					place: 2,
+					created_at: '2026-07-29T10:30:00',
+				},
+				{
+					id: 703,
+					carrierIndex: 2,
+					price: 57000,
+					place: 3,
+					created_at: '2026-07-29T10:00:00',
+				},
+				{
+					id: 704,
+					carrierIndex: 5,
+					price: 58000,
+					place: 4,
+					created_at: '2026-07-29T09:20:00',
+				},
+				{
+					id: 705,
+					carrierIndex: 6,
+					price: 59000,
+					place: 5,
+					created_at: '2026-07-28T18:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1008,
@@ -562,17 +874,44 @@ export function generate(): StoredAuction[] {
 			min: 10000,
 			max: 20000,
 			distance: 900,
-			bets: [
-				getBetItemDto({
-					id: 8,
-					auction_id: 1008,
-					price_with_vat: 18000,
-					price_no_vat: priceNoVat(18000),
+			bets: makeBets(1008, [
+				{
+					id: 801,
+					carrierIndex: 3,
+					price: 18000,
+					place: null,
 					is_rejected: true,
 					cancel_reason: 'Аукцион отменён организатором',
+					created_at: '2026-07-24T12:00:00',
+				},
+				{
+					id: 802,
+					carrierIndex: 1,
+					price: 18500,
 					place: null,
-				}),
-			],
+					is_rejected: true,
+					cancel_reason: 'Аукцион отменён организатором',
+					created_at: '2026-07-24T11:30:00',
+				},
+				{
+					id: 803,
+					carrierIndex: 2,
+					price: 19000,
+					place: null,
+					is_rejected: true,
+					cancel_reason: 'Аукцион отменён организатором',
+					created_at: '2026-07-24T11:00:00',
+				},
+				{
+					id: 804,
+					carrierIndex: 5,
+					price: 19500,
+					place: null,
+					is_rejected: true,
+					cancel_reason: 'Аукцион отменён организатором',
+					created_at: '2026-07-24T10:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1009,
@@ -628,18 +967,43 @@ export function generate(): StoredAuction[] {
 			min: 18000,
 			max: 32000,
 			distance: 280,
-			bets: [
-				getBetItemDto({
-					id: 9,
-					auction_id: 1010,
-					subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
-					organization_id: CURRENT_USER_ORG_ID,
-					organization_name: 'ООО Перевозчик',
-					price_with_vat: 27500,
-					price_no_vat: priceNoVat(27500),
+			bets: makeBets(1010, [
+				{
+					id: 1001,
+					carrierIndex: 0,
+					price: 27500,
 					place: 1,
-				}),
-			],
+					created_at: '2026-07-29T15:00:00',
+				},
+				{
+					id: 1002,
+					carrierIndex: 1,
+					price: 27000,
+					place: 2,
+					created_at: '2026-07-29T14:20:00',
+				},
+				{
+					id: 1003,
+					carrierIndex: 2,
+					price: 26500,
+					place: 3,
+					created_at: '2026-07-29T13:40:00',
+				},
+				{
+					id: 1004,
+					carrierIndex: 3,
+					price: 26000,
+					place: 4,
+					created_at: '2026-07-29T13:00:00',
+				},
+				{
+					id: 1005,
+					carrierIndex: 5,
+					price: 25500,
+					place: 5,
+					created_at: '2026-07-29T12:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1011,
@@ -668,19 +1032,30 @@ export function generate(): StoredAuction[] {
 			min: 19500,
 			max: 19500,
 			distance: 390,
-			bets: [
-				getBetItemDto({
-					id: 10,
-					auction_id: 1011,
-					subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
-					organization_id: CURRENT_USER_ORG_ID,
-					organization_name: 'ООО Перевозчик',
-					price_with_vat: 19500,
-					price_no_vat: priceNoVat(19500),
+			bets: makeBets(1011, [
+				{
+					id: 1101,
+					carrierIndex: 0,
+					price: 19500,
 					place: 1,
 					is_win: true,
-				}),
-			],
+					created_at: '2026-07-25T12:00:00',
+				},
+				{
+					id: 1102,
+					carrierIndex: 1,
+					price: 19500,
+					place: 2,
+					created_at: '2026-07-25T11:30:00',
+				},
+				{
+					id: 1103,
+					carrierIndex: 3,
+					price: 19500,
+					place: 3,
+					created_at: '2026-07-25T11:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1012,
@@ -709,28 +1084,57 @@ export function generate(): StoredAuction[] {
 			min: 25000,
 			max: 40000,
 			distance: 1600,
-			bets: [
-				getBetItemDto({
-					id: 11,
-					auction_id: 1012,
-					subscriber_id: 77,
-					organization_id: 77,
-					organization_name: 'ООО Северный Путь',
-					price_with_vat: 34000,
-					price_no_vat: priceNoVat(34000),
+			bets: makeBets(1012, [
+				{
+					id: 1201,
+					carrierIndex: 3,
+					price: 34000,
 					place: 1,
-				}),
-				getBetItemDto({
-					id: 12,
-					auction_id: 1012,
-					subscriber_id: CURRENT_USER_SUBSCRIBER_ID,
-					organization_id: CURRENT_USER_ORG_ID,
-					organization_name: 'ООО Перевозчик',
-					price_with_vat: 36000,
-					price_no_vat: priceNoVat(36000),
+					created_at: '2026-07-28T16:00:00',
+				},
+				{
+					id: 1202,
+					carrierIndex: 0,
+					price: 36000,
 					place: 2,
-				}),
-			],
+					created_at: '2026-07-28T15:30:00',
+				},
+				{
+					id: 1203,
+					carrierIndex: 1,
+					price: 36500,
+					place: 3,
+					created_at: '2026-07-28T15:00:00',
+				},
+				{
+					id: 1204,
+					carrierIndex: 2,
+					price: 37000,
+					place: 4,
+					created_at: '2026-07-28T14:20:00',
+				},
+				{
+					id: 1205,
+					carrierIndex: 5,
+					price: 37500,
+					place: 5,
+					created_at: '2026-07-28T13:40:00',
+				},
+				{
+					id: 1206,
+					carrierIndex: 6,
+					price: 38000,
+					place: 6,
+					created_at: '2026-07-28T13:00:00',
+				},
+				{
+					id: 1207,
+					carrierIndex: 7,
+					price: 38500,
+					place: 7,
+					created_at: '2026-07-28T12:00:00',
+				},
+			]),
 		}),
 		createStoredAuction({
 			id: 1013,

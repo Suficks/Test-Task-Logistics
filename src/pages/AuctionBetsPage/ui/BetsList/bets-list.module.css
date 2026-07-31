@@ -1,0 +1,28 @@
+.card {
+	height: 100%;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+
+	.title {
+		margin: 0;
+	}
+}
+
+.name {
+	white-space: nowrap;
+}
+
+.meta {
+	font-size: var(--ant-font-size-sm);
+}
+
+.ownTag {
+	margin-inline-start: 8px;
+}

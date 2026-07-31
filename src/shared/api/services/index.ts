@@ -1,1 +1,1 @@
-export { AuctionsApi } from './AuctionsApi';
+export { AuctionsApi, ApiRequestError } from './AuctionsApi';

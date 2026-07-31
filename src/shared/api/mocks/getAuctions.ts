@@ -31,7 +31,7 @@ const STATUS_TO_CODE: Record<AuctionStatusDto, number> = {
 	Unknown: 0,
 };
 
-let nextBetId = 100;
+let nextBetId = 2000;
 const auctions = generate();
 
 function getOrderUid(auction: StoredAuction): string {

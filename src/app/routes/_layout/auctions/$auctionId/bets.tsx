@@ -1,9 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
+
+import { AuctionBetsPage } from '@/pages/AuctionBetsPage';
 
 export const Route = createFileRoute('/_layout/auctions/$auctionId/bets')({
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  return <div>Hello "/auctions/$auctionId/bets"!</div>
-}
+	component: AuctionBetsPage,
+});

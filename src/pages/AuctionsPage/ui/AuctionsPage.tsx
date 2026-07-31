@@ -52,7 +52,7 @@ export const AuctionsPage = observer(function AuctionsPage() {
 	};
 
 	return (
-		<div className={styles.page}>
+		<div>
 			<div className={styles.header}>
 				<div>
 					<Typography.Title level={2} className={styles.title}>
